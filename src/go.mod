@@ -1,4 +1,4 @@
-module github.com/matheusmortatti/gba-go
+module github.com/matheusmortatti/gba-go/gba
 
 go 1.21.4
 

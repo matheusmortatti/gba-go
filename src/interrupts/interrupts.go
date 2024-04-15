@@ -19,7 +19,7 @@ func NewInterrupts() *Interrupts {
 }
 
 func (i *Interrupts) EnableVBlankInterrupt(handler func()) {
-	registers.Video.DispStat.SetBits(1 << 3)
+	registers.Lcd.DISPSTAT.SetBits(1 << 3)
 	itr := interrupt.New(machine.IRQ_VBLANK, i.handleInterrupt)
 	i.enableInterrupt(itr, handler)
 }
