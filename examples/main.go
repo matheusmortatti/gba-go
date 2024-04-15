@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "github.com/matheusmortatti/gba-go"
+	"github.com/matheusmortatti/gba-go/lib/interrupts"
 
 	"machine"
 	"tinygo.org/x/tinydraw"
@@ -9,7 +9,7 @@ import (
 
 var (
 	display    = machine.Display
-	interrupts = NewInterrupts()
+	interrupts = interrupts.NewInterrupts()
 )
 
 func main() {

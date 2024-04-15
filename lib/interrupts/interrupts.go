@@ -4,7 +4,7 @@ import (
 	"machine"
 	"runtime/interrupt"
 
-	"github.com/matheusmortatti/gba-go/registers"
+	"github.com/matheusmortatti/gba-go/lib/registers"
 )
 
 type Interrupts struct {
