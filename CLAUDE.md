@@ -64,3 +64,50 @@ The `examples/` directory contains sample GBA programs demonstrating library usa
 - Input state is polled each frame - call `input.Poll()` in main loop
 - Use `video.VSync()` to synchronize with display refresh rate
 - VRAM is accessed directly at memory address 0x06000000 for pixel manipulation
+
+## Critical GBA Programming Requirements
+
+### Display Initialization (CRITICAL for visible output)
+When creating GBA programs, the display MUST be properly initialized or you will get a blank white screen:
+
+```go
+// CORRECT: Set video mode and enable background in one operation
+registers.Lcd.DISPCNT.Set(memory.MODE_3 | (1 << 10)) // Mode 3 + BG2 enabled
+
+// INCORRECT: Using separate SetBits/ClearBits calls may not work reliably
+registers.Lcd.DISPCNT.SetBits(memory.MODE_3)  // Don't do this
+registers.Lcd.DISPCNT.SetBits(1 << 10)        // Don't do this
+```
+
+### Double Buffering Display Control
+For double buffering in Mode 4/5, update the entire DISPCNT register:
+
+```go
+// CORRECT: Update entire register with mode, BG2, and frame selection
+var displayValue uint16
+if currentPage == 1 {
+    displayValue = uint16(mode) | (1 << 10) | (1 << 4) // Mode + BG2 + Frame1
+} else {
+    displayValue = uint16(mode) | (1 << 10)             // Mode + BG2 + Frame0
+}
+registers.Lcd.DISPCNT.Set(displayValue)
+
+// INCORRECT: Partial register updates may not work
+registers.Lcd.DISPCNT.SetBits(1 << 4)   // Don't do this
+registers.Lcd.DISPCNT.ClearBits(1 << 4) // Don't do this
+```
+
+### Volatile Register Usage
+Always use the correct volatile register API:
+
+```go
+// CORRECT: Use Get() and Set() methods
+(*volatile.Register16)(unsafe.Pointer(addr)).Set(value)
+value := (*volatile.Register16)(unsafe.Pointer(addr)).Get()
+
+// INCORRECT: Direct assignment with volatile.Register16()
+*(*volatile.Register16)(unsafe.Pointer(addr)) = volatile.Register16(value) // Don't do this
+```
+
+### Testing Programs
+Always test built programs with: `mgba examples/bin/program.gba` to verify visual output is working correctly.
